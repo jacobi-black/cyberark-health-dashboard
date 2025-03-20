@@ -2,9 +2,8 @@ import requests
 import logging
 import json
 import os
-import random
 from datetime import datetime, timedelta
-from typing import Dict, Any, Tuple, List, Optional
+from typing import Dict, List, Any, Tuple
 from requests.exceptions import RequestException
 
 from app.config import CYBERARK_API, DEMO_MODE
@@ -20,17 +19,23 @@ logger = logging.getLogger('cyberark_api')
 class CyberArkAPI:
     def __init__(self):
         """
-        Initialiser l'API CyberArk
+        Initialiser l'API CyberArk selon la documentation officielle
+        https://docs.cyberark.com/pam-self-hosted/14.2/en/content/webservices/implementing%20privileged%20account%20security%20web%20services%20.htm
         """
-        self.base_url = CYBERARK_API["url"]
+        self.base_url = CYBERARK_API["base_url"]
         self.username = CYBERARK_API["username"]
         self.password = CYBERARK_API["password"]
+        self.auth_type = CYBERARK_API["auth_type"]
         self.token = None
         self.token_expiry = None
-        self.timeout = CYBERARK_API["timeout"]
-        self.verify_ssl = CYBERARK_API["verify_ssl"]
+        self.session = requests.Session()
+        self.verify_ssl = CYBERARK_API.get("verify_ssl", True)
+        self.timeout = CYBERARK_API.get("timeout", 30)
         self.demo_mode = DEMO_MODE
         self.demo_data = None
+        
+        # API version (v1 ou latest)
+        self.api_version = "v1"
         
         if self.demo_mode:
             self._load_demo_data()
@@ -39,35 +44,50 @@ class CyberArkAPI:
     
     def _load_demo_data(self):
         """
-        Charger les données de démo
+        Charger les données d'exemple pour le mode démo
         """
         try:
-            # Charger depuis le fichier de démo si disponible
-            if os.path.exists('demo_data.json'):
-                with open('demo_data.json', 'r') as f:
+            # Chemin vers le fichier de données d'exemple
+            sample_data_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 
+                                            "powerbi", "assets", "sample_data.json")
+            
+            if os.path.exists(sample_data_path):
+                with open(sample_data_path, "r") as f:
                     self.demo_data = json.load(f)
-                    logger.info("Données de démo chargées depuis demo_data.json")
+                    
+                logger.info(f"Données d'exemple chargées depuis {sample_data_path}")
             else:
-                # Générer des données de démo
-                self.demo_data = self._generate_demo_data()
-                
-                # Enregistrer les données de démo générées
-                with open('demo_data.json', 'w') as f:
-                    json.dump(self.demo_data, f, indent=2)
-                    logger.info("Données de démo générées et enregistrées dans demo_data.json")
+                # Chemin alternatif pour des données de démo
+                if os.path.exists('demo_data.json'):
+                    with open('demo_data.json', 'r') as f:
+                        self.demo_data = json.load(f)
+                        logger.info("Données de démo chargées depuis demo_data.json")
+                else:
+                    # Générer des données de démo
+                    self.demo_data = self._generate_demo_data()
+                    logger.info("Données de démo générées en mémoire")
+                    
+                    # Enregistrer les données de démo générées pour référence future
+                    try:
+                        with open('demo_data.json', 'w') as f:
+                            json.dump(self.demo_data, f, indent=2)
+                            logger.info("Données de démo enregistrées dans demo_data.json")
+                    except Exception as e:
+                        logger.warning(f"Impossible d'enregistrer les données de démo: {str(e)}")
         except Exception as e:
-            logger.error(f"Erreur lors du chargement des données de démo: {str(e)}")
-            # Générer des données de démo en mémoire
+            logger.error(f"Erreur lors du chargement des données d'exemple: {str(e)}")
+            # Créer des données de démo minimales en cas d'échec
             self.demo_data = self._generate_demo_data()
     
     def _generate_demo_data(self) -> Dict[str, Any]:
         """
-        Générer des données de démo aléatoires
+        Générer des données de démo
         """
+        import random
         current_time = datetime.now()
         
         # Générer des données pour les composants
-        component_types = ["CPM", "PSM", "PVWA", "AAM"]
+        component_types = ["CPM", "PSM", "PVWA", "AAM Credential Provider"]
         component_status_data = []
         
         for component_type in component_types:
@@ -187,38 +207,64 @@ class CyberArkAPI:
     
     def login(self) -> bool:
         """
-        Se connecter à l'API CyberArk et obtenir un jeton d'authentification
+        Se connecter à l'API CyberArk et obtenir un jeton d'authentification selon la documentation officielle
         """
+        # En mode démo, simuler une connexion réussie
         if self.demo_mode:
             self.token = "demo_token"
             self.token_expiry = datetime.now() + timedelta(hours=8)
+            logger.info("Connecté avec succès (mode démo)")
             return True
             
-        logger.info("Tentative de connexion à l'API CyberArk")
-        
         try:
-            url = f"{self.base_url}/auth/LogOn"
+            # URL de connexion selon la documentation officielle
+            login_url = f"{self.base_url}/PasswordVault/API/auth/{self.auth_type}/Logon"
+            
             headers = {
                 "Content-Type": "application/json"
             }
-            data = {
-                "username": self.username,
-                "password": self.password
-            }
             
-            response = requests.post(
-                url, 
+            # Corps de la requête selon le type d'authentification
+            if self.auth_type == "cyberark":
+                data = {
+                    "username": self.username,
+                    "password": self.password,
+                    "concurrentSession": True
+                }
+            elif self.auth_type == "ldap":
+                data = {
+                    "username": self.username,
+                    "password": self.password,
+                    "concurrentSession": True
+                }
+            elif self.auth_type == "radius":
+                data = {
+                    "username": self.username,
+                    "password": self.password
+                }
+            else:
+                logger.error(f"Type d'authentification non supporté: {self.auth_type}")
+                return False
+            
+            # Envoi de la requête
+            response = self.session.post(
+                login_url, 
                 headers=headers, 
                 json=data, 
-                timeout=self.timeout,
-                verify=self.verify_ssl
+                verify=self.verify_ssl,
+                timeout=self.timeout
             )
             
             if response.status_code == 200:
-                response_data = response.json()
-                self.token = response_data.get("Token")
-                # Définir l'expiration du jeton (typiquement 8 heures)
+                # Le token est renvoyé directement comme texte selon la documentation
+                self.token = response.text.strip('"')
+                
+                # Configurer l'en-tête d'autorisation pour les requêtes futures
+                self.session.headers.update({"Authorization": self.token})
+                
+                # Définir l'expiration du jeton (généralement 8 heures pour CyberArk)
                 self.token_expiry = datetime.now() + timedelta(hours=8)
+                
                 logger.info("Connexion réussie à l'API CyberArk")
                 return True
             else:
@@ -236,50 +282,50 @@ class CyberArkAPI:
         if self.demo_mode:
             return True
             
-        if not self.token or not self.token_expiry:
-            return False
-            
-        # Vérifier si le jeton est toujours valide (avec une marge de 5 minutes)
-        return datetime.now() < (self.token_expiry - timedelta(minutes=5))
+        return self.token is not None and self.token_expiry is not None and datetime.now() < (self.token_expiry - timedelta(minutes=5))
     
     def ensure_logged_in(self) -> bool:
         """
         S'assurer que l'utilisateur est connecté
         """
-        if self.is_token_valid():
-            return True
-            
-        return self.login()
+        if not self.is_token_valid():
+            return self.login()
+        return True
     
     def logout(self) -> bool:
         """
         Se déconnecter de l'API CyberArk
         """
-        if self.demo_mode or not self.token:
+        # En mode démo, simuler une déconnexion réussie
+        if self.demo_mode:
             self.token = None
             self.token_expiry = None
+            logger.info("Déconnecté avec succès (mode démo)")
             return True
             
-        logger.info("Tentative de déconnexion de l'API CyberArk")
-        
         try:
-            url = f"{self.base_url}/auth/LogOff"
+            if not self.token:
+                return True
+                
+            # URL de déconnexion selon la documentation officielle
+            logout_url = f"{self.base_url}/PasswordVault/API/auth/Logoff"
+            
             headers = {
                 "Content-Type": "application/json",
-                "Authorization": f"Bearer {self.token}"
+                "Authorization": self.token
             }
             
-            response = requests.post(
-                url, 
+            response = self.session.post(
+                logout_url, 
                 headers=headers, 
-                timeout=self.timeout,
-                verify=self.verify_ssl
+                verify=self.verify_ssl,
+                timeout=self.timeout
             )
             
             if response.status_code == 200:
-                logger.info("Déconnexion réussie de l'API CyberArk")
                 self.token = None
                 self.token_expiry = None
+                logger.info("Déconnecté avec succès de l'API CyberArk")
                 return True
             else:
                 logger.error(f"Échec de la déconnexion de l'API CyberArk: {response.status_code} - {response.text}")
@@ -338,6 +384,8 @@ class CyberArkAPI:
         if not self.demo_data:
             return
             
+        import random
+        
         # Mettre à jour l'utilisation du CPU et de la mémoire
         self.demo_data["system_health"]["CPU_Usage"] = round(random.uniform(10.0, 80.0), 1)
         self.demo_data["system_health"]["Memory_Usage"] = round(random.uniform(20.0, 90.0), 1)
@@ -361,10 +409,22 @@ class CyberArkAPI:
         if self.demo_mode and self.demo_data:
             return self.demo_data.get("component_status", {})
         
-        # Implémentation de l'appel API réel
-        # À compléter avec l'API réelle
+        # Implémentation de l'appel API réel selon la documentation
+        try:
+            if not self.ensure_logged_in():
+                return {}
+                
+            # Dans une implémentation réelle, on appellerait l'API appropriée
+            # Par exemple:
+            # url = f"{self.base_url}/PasswordVault/API/{self.api_version}/Components"
+            # response = self.session.get(url, verify=self.verify_ssl, timeout=self.timeout)
+            
+            # Pour l'instant, nous retournons une structure vide
+            return {"Items": []}
         
-        return {}
+        except Exception as e:
+            logger.error(f"Erreur lors de la récupération de l'état des composants: {str(e)}")
+            return {"Items": []}
     
     def get_component_details(self, component_type: str) -> List[Dict[str, Any]]:
         """
@@ -400,10 +460,22 @@ class CyberArkAPI:
             
             return component_details
         
-        # Implémentation de l'appel API réel
-        # À compléter avec l'API réelle
+        # Implémentation de l'appel API réel selon la documentation
+        try:
+            if not self.ensure_logged_in():
+                return []
+                
+            # Dans une implémentation réelle, on appellerait l'API appropriée
+            # Par exemple:
+            # url = f"{self.base_url}/PasswordVault/API/{self.api_version}/Components/{component_type}/Details"
+            # response = self.session.get(url, verify=self.verify_ssl, timeout=self.timeout)
+            
+            # Pour l'instant, nous retournons une liste vide
+            return []
         
-        return []
+        except Exception as e:
+            logger.error(f"Erreur lors de la récupération des détails des composants: {str(e)}")
+            return []
     
     def get_vault_status(self) -> Dict[str, Any]:
         """
@@ -412,10 +484,22 @@ class CyberArkAPI:
         if self.demo_mode and self.demo_data:
             return self.demo_data.get("vault_status", {})
         
-        # Implémentation de l'appel API réel
-        # À compléter avec l'API réelle
+        # Implémentation de l'appel API réel selon la documentation
+        try:
+            if not self.ensure_logged_in():
+                return {}
+                
+            # Dans une implémentation réelle, on appellerait l'API appropriée
+            # Par exemple:
+            # url = f"{self.base_url}/PasswordVault/API/{self.api_version}/Safes/Statistics"
+            # response = self.session.get(url, verify=self.verify_ssl, timeout=self.timeout)
+            
+            # Pour l'instant, nous retournons une structure vide
+            return {"Safes": {}}
         
-        return {}
+        except Exception as e:
+            logger.error(f"Erreur lors de la récupération de l'état du coffre-fort: {str(e)}")
+            return {"Safes": {}}
     
     def get_accounts_status(self) -> Dict[str, Any]:
         """
@@ -424,10 +508,22 @@ class CyberArkAPI:
         if self.demo_mode and self.demo_data:
             return self.demo_data.get("accounts_status", {})
         
-        # Implémentation de l'appel API réel
-        # À compléter avec l'API réelle
+        # Implémentation de l'appel API réel selon la documentation
+        try:
+            if not self.ensure_logged_in():
+                return {}
+                
+            # Dans une implémentation réelle, on appellerait l'API appropriée
+            # Par exemple:
+            # url = f"{self.base_url}/PasswordVault/API/{self.api_version}/Accounts/Statistics"
+            # response = self.session.get(url, verify=self.verify_ssl, timeout=self.timeout)
+            
+            # Pour l'instant, nous retournons une structure vide
+            return {"value": {}}
         
-        return {}
+        except Exception as e:
+            logger.error(f"Erreur lors de la récupération de l'état des comptes: {str(e)}")
+            return {"value": {}}
     
     def get_system_health(self) -> Dict[str, Any]:
         """
@@ -436,10 +532,22 @@ class CyberArkAPI:
         if self.demo_mode and self.demo_data:
             return self.demo_data.get("system_health", {})
         
-        # Implémentation de l'appel API réel
-        # À compléter avec l'API réelle
+        # Implémentation de l'appel API réel selon la documentation
+        try:
+            if not self.ensure_logged_in():
+                return {}
+                
+            # Dans une implémentation réelle, on appellerait l'API appropriée
+            # Par exemple:
+            # url = f"{self.base_url}/PasswordVault/API/{self.api_version}/System/Health"
+            # response = self.session.get(url, verify=self.verify_ssl, timeout=self.timeout)
+            
+            # Pour l'instant, nous retournons une structure vide
+            return {}
         
-        return {}
+        except Exception as e:
+            logger.error(f"Erreur lors de la récupération de l'état de santé du système: {str(e)}")
+            return {}
     
     def get_recent_activities(self) -> List[Dict[str, Any]]:
         """
@@ -448,10 +556,22 @@ class CyberArkAPI:
         if self.demo_mode and self.demo_data:
             return self.demo_data.get("recent_activities", [])
         
-        # Implémentation de l'appel API réel
-        # À compléter avec l'API réelle
+        # Implémentation de l'appel API réel selon la documentation
+        try:
+            if not self.ensure_logged_in():
+                return []
+                
+            # Dans une implémentation réelle, on appellerait l'API appropriée
+            # Par exemple:
+            # url = f"{self.base_url}/PasswordVault/API/{self.api_version}/Activities"
+            # response = self.session.get(url, verify=self.verify_ssl, timeout=self.timeout)
+            
+            # Pour l'instant, nous retournons une liste vide
+            return []
         
-        return []
+        except Exception as e:
+            logger.error(f"Erreur lors de la récupération des activités récentes: {str(e)}")
+            return []
     
     def get_failed_logins(self) -> List[Dict[str, Any]]:
         """
@@ -460,7 +580,19 @@ class CyberArkAPI:
         if self.demo_mode and self.demo_data:
             return self.demo_data.get("failed_logins", [])
         
-        # Implémentation de l'appel API réel
-        # À compléter avec l'API réelle
+        # Implémentation de l'appel API réel selon la documentation
+        try:
+            if not self.ensure_logged_in():
+                return []
+                
+            # Dans une implémentation réelle, on appellerait l'API appropriée
+            # Par exemple:
+            # url = f"{self.base_url}/PasswordVault/API/{self.api_version}/Activities/Failed"
+            # response = self.session.get(url, verify=self.verify_ssl, timeout=self.timeout)
+            
+            # Pour l'instant, nous retournons une liste vide
+            return []
         
-        return []
+        except Exception as e:
+            logger.error(f"Erreur lors de la récupération des tentatives de connexion échouées: {str(e)}")
+            return []
