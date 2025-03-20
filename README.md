@@ -1,112 +1,113 @@
 # CyberArk Health Dashboard
 
-Un tableau de bord moderne pour surveiller la santé de votre environnement CyberArk Privileged Access Manager (PAM).
+Un tableau de bord complet pour surveiller la santé des composants CyberArk et le statut des comptes gérés.
 
-![CyberArk Health Dashboard](powerbi/assets/dashboard_preview.png)
+## Caractéristiques
 
-## 🌟 Fonctionnalités
+- **Surveillance en temps réel** des composants CyberArk (CPM, PVWA, PSM, AAM)
+- **Statistiques des comptes** gérés et non gérés
+- **Métriques système** (CPU, mémoire, espace disque)
+- **Détection des événements de sécurité** et des tentatives de connexion infructueuses
+- **Alertes** sur les composants non connectés ou les ressources système élevées
+- **Intégration avec PowerBI** pour une visualisation avancée
 
-- **Surveillance des composants** - Suivi en temps réel de l'état de tous les composants CyberArk (CPM, PVWA, PSM, etc.)
-- **Statistiques des comptes** - Vue d'ensemble des comptes gérés et non gérés
-- **Métriques système** - Surveillance des ressources système (CPU, mémoire, disque)
-- **Événements de sécurité** - Journal des événements de sécurité récents
-- **Alertes** - Notification des problèmes critiques
-- **Tableau de bord Power BI** - Visualisations riches et interactives
-- **Mode démonstration** - Fonctionne avec des données de test sans connexion à CyberArk
-
-## 📋 Prérequis
+## Prérequis
 
 - Python 3.8+
-- Power BI Desktop (pour les visualisations)
-- CyberArk PAM v12.0+ (pour l'intégration avec un environnement réel)
+- CyberArk PAM v12.0+
+- Compte CyberArk avec droits d'audit suffisants
+- PowerBI Desktop (pour les tableaux de bord)
 
-## 🚀 Installation rapide
+## Installation rapide
 
-1. Cloner ce dépôt:
 ```bash
-git clone https://github.com/your-username/cyberark-health-dashboard.git
+# Cloner le dépôt
+git clone https://github.com/jacobi-black/cyberark-health-dashboard.git
 cd cyberark-health-dashboard
-```
 
-2. Installer les dépendances:
-```bash
+# Installer les dépendances
 pip install -r requirements.txt
-```
 
-3. Configurer l'environnement:
-```bash
-# Copier le fichier d'exemple et l'éditer selon vos besoins
+# Configurer l'environnement
 cp .env.example .env
-```
+# Éditer .env avec vos paramètres
 
-4. Initialiser la base de données:
-```bash
+# Initialiser la base de données
 python -c "from app.models import create_tables; create_tables()"
-```
 
-5. Démarrer l'API:
-```bash
+# Démarrer l'API
 python main.py
 ```
 
-6. Accéder au tableau de bord:
-   - API: http://localhost:8000
-   - Documentation API: http://localhost:8000/docs
-   - Power BI: Suivre les instructions dans [powerbi/README.md](powerbi/README.md)
+## Configuration
 
-## 🔧 Configuration
+Configurez les paramètres dans le fichier `.env` :
 
-Le fichier `.env` permet de configurer:
+```
+# Configuration de l'API CyberArk
+CYBERARK_API_URL=https://votre-instance-cyberark.com
+CYBERARK_AUTH_TYPE=cyberark  # ou ldap, radius
+CYBERARK_USERNAME=votreUser
+CYBERARK_PASSWORD=votreMotDePasse
 
-- **Mode démonstration** - Utilise des données d'exemple sans se connecter à CyberArk
-- **Connexion à l'API CyberArk** - URL, méthode d'authentification, identifiants
-- **Base de données** - Configurer SQLite (par défaut) ou SQL Server
-- **Intervalle de collecte** - Fréquence de mise à jour des données
-- **Port API** - Port d'écoute du serveur HTTP
+# Configuration de la base de données
+DB_CONNECTION_STRING=sqlite:///cyberark_health.db
 
-## 📊 Visualisations Power BI
-
-![Dashboard Layout](powerbi/assets/layout_example.png)
-
-Le dashboard Power BI inclut:
-
-- Cartes de score pour les métriques clés
-- Graphiques en anneau pour l'état des composants
-- Graphiques à barres pour la gestion des comptes
-- Tableaux pour les événements récents
-- Filtres par composant, date et severity
-
-Consultez [powerbi/README.md](powerbi/README.md) pour les instructions détaillées de configuration de Power BI.
-
-## 📚 Documentation
-
-- [Guide utilisateur](wiki/UserGuide.md)
-- [Guide d'installation](wiki/InstallationGuide.md)
-- [Guide de dépannage](wiki/Troubleshooting.md)
-- [API REST](wiki/APIReference.md)
-- [Schéma de données](wiki/DataSchema.md)
-
-## 🛠️ Développement
-
-```bash
-# Installation des dépendances de développement
-pip install -r requirements-dev.txt
-
-# Exécution des tests
-pytest
-
-# Vérification du style de code
-flake8
+# Configuration de l'API
+API_HOST=0.0.0.0
+API_PORT=8000
 ```
 
-## 📝 Licence
+## Visualisation avec PowerBI
 
-Ce projet est sous licence MIT - voir le fichier [LICENSE](LICENSE) pour plus de détails.
+Le dashboard peut être visualisé directement via l'API REST ou à travers PowerBI :
 
-## 🤝 Contribution
+1. Connectez PowerBI Desktop à l'API REST (http://localhost:8000/api/dashboard)
+2. Importez les données en utilisant le connecteur JSON ou Web
+3. Créez vos visualisations ou utilisez les modèles disponibles dans `/powerbi/`
 
-Les contributions sont les bienvenues! Consultez [CONTRIBUTING.md](CONTRIBUTING.md) pour les directives.
+## Rôle de la base de données
 
-## 📧 Contact
+La base de données joue un rôle crucial dans l'application :
 
-Pour toute question ou suggestion, veuillez contacter [votre-email@example.com](mailto:votre-email@example.com).
+- **Historique des données** : Permet d'analyser l'évolution des métriques sur la durée
+- **Continuité de service** : Conserve les données même en cas d'indisponibilité temporaire de l'API CyberArk
+- **Analyses rétroactives** : Possibilité d'identifier les tendances et comportements anormaux
+- **Support du mode hors ligne** : L'application peut afficher les dernières données collectées même sans connexion
+- **Optimisation des performances** : Réduit les appels API répétitifs vers CyberArk
+
+## Documentation
+
+- [Guide d'installation](docs/installation.md)
+- [Guide de l'utilisateur](docs/user-guide.md)
+- [Documentation de l'API](http://localhost:8000/docs) (disponible après démarrage)
+- [Schéma des données](docs/data-schema.md)
+- [Dépannage](docs/troubleshooting.md)
+
+## Développement
+
+Pour contribuer au projet :
+
+```bash
+# Créer un environnement virtuel
+python -m venv venv
+source venv/bin/activate  # ou venv\Scripts\activate sur Windows
+
+# Installer les dépendances de développement
+pip install -r requirements-dev.txt
+
+# Lancer les tests
+pytest
+```
+
+## Licence
+
+Ce projet est sous licence MIT. Voir le fichier [LICENSE](LICENSE) pour plus de détails.
+
+## Contribution
+
+Toute contribution est la bienvenue ! Veuillez consulter [CONTRIBUTING.md](CONTRIBUTING.md) pour les directives.
+
+## Contact
+
+Pour toute question ou suggestion, veuillez ouvrir une issue sur ce dépôt.
