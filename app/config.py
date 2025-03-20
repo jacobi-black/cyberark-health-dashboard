@@ -9,10 +9,12 @@ DEMO_MODE = os.getenv("DEMO_MODE", "true").lower() == "true"
 
 # Configuration de l'API CyberArk
 CYBERARK_API = {
-    "base_url": os.getenv("CYBERARK_API_URL", "https://your-cyberark-instance.com/PasswordVault"),
+    "base_url": os.getenv("CYBERARK_API_URL", "https://your-cyberark-instance.com"),
     "auth_type": os.getenv("CYBERARK_AUTH_TYPE", "cyberark"),
     "username": os.getenv("CYBERARK_USERNAME", ""),
     "password": os.getenv("CYBERARK_PASSWORD", ""),
+    "timeout": int(os.getenv("CYBERARK_API_TIMEOUT", "30")),
+    "verify_ssl": os.getenv("CYBERARK_API_VERIFY_SSL", "true").lower() == "true"
 }
 
 # Configuration de la base de données
