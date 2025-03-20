@@ -1,0 +1,24 @@
+# API et serveur web
+fastapi==0.104.1
+uvicorn==0.24.0
+pydantic==2.4.2
+python-dotenv==1.0.0
+
+# Base de données
+SQLAlchemy==2.0.22
+
+# Client HTTP
+requests==2.31.0
+
+# Traitement des données
+pandas==2.1.1
+numpy==1.25.2
+
+# Tests
+pytest==7.4.0
+pytest-cov==4.1.0
+
+# Outils de développement
+black==23.7.0
+flake8==6.0.0
+isort==5.12.0
