@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberArk Health Dashboard</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav class="navbar">
+                <div class="logo">
+                    CyberArk Health Dashboard
+                </div>
+                <ul class="nav-links">
+                    <li><a href="/" class="active">Accueil</a></li>
+                    <li><a href="/api/docs" target="_blank">API</a></li>
+                    <li><a href="https://github.com/jacobi-black/cyberark-health-dashboard" target="_blank">GitHub</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <main class="main-content">
+            <section class="hero">
+                <h1>Tableau de bord de santé CyberArk</h1>
+                <p>Surveillez l'état de votre environnement CyberArk en temps réel. Consultez l'état des composants, les statistiques des comptes et les événements de sécurité.</p>
+                <div>
+                    <button id="refresh-data" class="btn">Actualiser les données</button>
+                </div>
+            </section>
+
+            <div id="error-container" style="display: none; background-color: #fee2e2; color: #b91c1c; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1.5rem;"></div>
+
+            <div class="dashboard-grid">
+                <!-- État des composants -->
+                <div class="card" id="component-status">
+                    <div class="card-header">
+                        <h2 class="card-title">État des composants</h2>
+                    </div>
+                    <div class="metric">
+                        <div id="component-global-status" class="metric-value">0%</div>
+                        <div class="metric-label">composants connectés</div>
+                    </div>
+                    <ul class="component-list" id="component-list">
+                        <!-- Les éléments de composants seront injectés ici par JavaScript -->
+                    </ul>
+                </div>
+
+                <!-- État du coffre-fort -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Coffre-fort</h2>
+                    </div>
+                    <div class="metric">
+                        <div id="total-safes" class="metric-value">0</div>
+                        <div class="metric-label">coffres</div>
+                    </div>
+                    <div class="metric">
+                        <div id="total-accounts" class="metric-value">0</div>
+                        <div class="metric-label">comptes</div>
+                    </div>
+                    <div class="metric">
+                        <div id="vault-version" class="metric-value">N/A</div>
+                        <div class="metric-label">version</div>
+                    </div>
+                    <div class="metric">
+                        <div id="license-status" class="metric-value">N/A</div>
+                        <div class="metric-label">licence</div>
+                    </div>
+                </div>
+
+                <!-- État des comptes -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Comptes</h2>
+                    </div>
+                    <div class="metric">
+                        <div id="managed-accounts" class="metric-value">0</div>
+                        <div class="metric-label">gérés</div>
+                    </div>
+                    <div class="metric">
+                        <div id="non-managed-accounts" class="metric-value">0</div>
+                        <div class="metric-label">non gérés</div>
+                    </div>
+                    <div class="metric">
+                        <div id="pending-accounts" class="metric-value">0</div>
+                        <div class="metric-label">en attente</div>
+                    </div>
+                    <div class="metric">
+                        <div id="failed-accounts" class="metric-value">0</div>
+                        <div class="metric-label">échoués</div>
+                    </div>
+                </div>
+
+                <!-- État de santé du système -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Santé système</h2>
+                    </div>
+                    <div class="metric">
+                        <div id="cpu-usage" class="metric-value">0%</div>
+                        <div class="metric-label">CPU</div>
+                    </div>
+                    <div class="metric">
+                        <div id="memory-usage" class="metric-value">0%</div>
+                        <div class="metric-label">Mémoire</div>
+                    </div>
+                    <div class="metric">
+                        <div id="disk-usage" class="metric-value">0%</div>
+                        <div class="metric-label">Disque</div>
+                    </div>
+                    <div class="metric">
+                        <div id="network-latency" class="metric-value">0 ms</div>
+                        <div class="metric-label">Latence réseau</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Activités récentes -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Activités récentes</h2>
+                </div>
+                <div class="table-container">
+                    <table id="recent-activities-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Utilisateur</th>
+                                <th>Type</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Les activités récentes seront injectées ici par JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Tentatives de connexion échouées -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Tentatives de connexion échouées</h2>
+                </div>
+                <div class="table-container">
+                    <table id="failed-logins-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Utilisateur</th>
+                                <th>IP source</th>
+                                <th>Raison</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Les tentatives de connexion échouées seront injectées ici par JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Section pour PowerBI -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Visualisation PowerBI</h2>
+                </div>
+                <div style="padding: 1rem; text-align: center;">
+                    <p>Pour une visualisation avancée, utilisez PowerBI Desktop pour vous connecter à l'API:</p>
+                    <ul style="text-align: left; margin: 1rem 0; line-height: 1.6;">
+                        <li>URL de l'API: <strong>http://localhost:8000/api/dashboard</strong></li>
+                        <li>Utilisez le modèle PowerBI dans <strong>/powerbi/template.pbix</strong></li>
+                        <li>Ou créez votre propre dashboard en connectant PowerBI à l'URL de l'API</li>
+                    </ul>
+                    <a href="/powerbi/CyberArk_Health_Dashboard.pbix" class="btn" download>Télécharger le modèle PowerBI</a>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>Dernière mise à jour: <span id="last-update-time">-</span></p>
+            <p>CyberArk Health Dashboard &copy; 2023</p>
+        </div>
+    </footer>
+
+    <script src="/static/js/dashboard.js"></script>
+</body>
+</html>
