@@ -1,0 +1,18 @@
+# Inclure tous les packages de requirements.txt
+-r requirements.txt
+
+# Outils de développement additionnels
+black==23.7.0
+flake8==6.0.0
+isort==5.12.0
+mypy==1.5.1
+pre-commit==3.3.3
+
+# Tests
+pytest==7.4.0
+pytest-cov==4.1.0
+pytest-mock==3.11.1
+
+# Documentation
+mkdocs==1.5.2
+mkdocs-material==9.3.1
