@@ -1,24 +1,29 @@
 # CyberArk Health Dashboard
 
-Un tableau de bord complet pour surveiller la santé des composants CyberArk et le statut des comptes gérés.
+Tableau de bord de surveillance pour les environnements CyberArk Privileged Access Management (PAM). Cet outil permet aux administrateurs de surveiller en temps réel la santé et les performances de tous les composants CyberArk.
 
-## Caractéristiques
+![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
+![Python](https://img.shields.io/badge/python-3.8+-green.svg)
+![License](https://img.shields.io/badge/license-MIT-orange.svg)
 
-- **Surveillance en temps réel** des composants CyberArk (CPM, PVWA, PSM, AAM)
-- **Statistiques des comptes** gérés et non gérés
-- **Métriques système** (CPU, mémoire, espace disque)
-- **Détection des événements de sécurité** et des tentatives de connexion infructueuses
-- **Alertes** sur les composants non connectés ou les ressources système élevées
-- **Intégration avec PowerBI** pour une visualisation avancée
+## 🚀 Fonctionnalités
 
-## Prérequis
+- **Surveillance en temps réel** des composants CyberArk (CPM, PSM, PVWA, AAM)
+- **Statistiques des comptes** (gérés, non gérés, en attente, échoués)
+- **Métriques système** (CPU, mémoire, disque, réseau)
+- **Événements de sécurité** et tentatives de connexion échouées
+- **Alertes** pour les problèmes critiques
+- **Intégration avec Power BI** pour des visualisations avancées
+- **Interface web** simple et intuitive pour un accès rapide aux données
 
-- Python 3.8+
-- CyberArk PAM v12.0+
-- Compte CyberArk avec droits d'audit suffisants
-- PowerBI Desktop (pour les tableaux de bord)
+## 📋 Prérequis
 
-## Installation rapide
+- Python 3.8 ou supérieur
+- CyberArk PAM v12.0 ou supérieur
+- Accès à l'API REST de CyberArk
+- Optionnel: Power BI Desktop (pour les visualisations avancées)
+
+## ⚡ Installation rapide
 
 ```bash
 # Cloner le dépôt
@@ -30,84 +35,93 @@ pip install -r requirements.txt
 
 # Configurer l'environnement
 cp .env.example .env
-# Éditer .env avec vos paramètres
+# Modifier .env avec vos paramètres
 
 # Initialiser la base de données
-python -c "from app.models import create_tables; create_tables()"
+python -c "from app.models import init_db; init_db()"
 
 # Démarrer l'API
 python main.py
 ```
 
-## Configuration
+## 🔧 Configuration
 
-Configurez les paramètres dans le fichier `.env` :
+Configurez l'application en modifiant le fichier `.env` :
 
-```
-# Configuration de l'API CyberArk
-CYBERARK_API_URL=https://votre-instance-cyberark.com
-CYBERARK_AUTH_TYPE=cyberark  # ou ldap, radius
-CYBERARK_USERNAME=votreUser
-CYBERARK_PASSWORD=votreMotDePasse
+```ini
+# Mode démo - mettez false pour se connecter à une vraie instance
+DEMO_MODE=true
 
-# Configuration de la base de données
+# API CyberArk
+CYBERARK_API_URL=https://your-cyberark-instance.com/PasswordVault
+CYBERARK_AUTH_TYPE=cyberark
+CYBERARK_USERNAME=admin
+CYBERARK_PASSWORD=password
+
+# Base de données
 DB_CONNECTION_STRING=sqlite:///cyberark_health.db
 
-# Configuration de l'API
-API_HOST=0.0.0.0
-API_PORT=8000
+# Intervalle de collecte en secondes
+COLLECTOR_INTERVAL=3600
 ```
 
-## Visualisation avec PowerBI
+## 🖥️ Interface web
 
-Le dashboard peut être visualisé directement via l'API REST ou à travers PowerBI :
+Une fois l'application démarrée, accédez à l'interface web:
 
-1. Connectez PowerBI Desktop à l'API REST (http://localhost:8000/api/dashboard)
-2. Importez les données en utilisant le connecteur JSON ou Web
-3. Créez vos visualisations ou utilisez les modèles disponibles dans `/powerbi/`
+- URL : [http://localhost:8000](http://localhost:8000)
+- Documentation API : [http://localhost:8000/docs](http://localhost:8000/docs)
 
-## Rôle de la base de données
+## 📊 Visualisations Power BI
 
-La base de données joue un rôle crucial dans l'application :
+Un modèle Power BI est fourni dans le dossier `powerbi/`. Pour l'utiliser:
 
-- **Historique des données** : Permet d'analyser l'évolution des métriques sur la durée
-- **Continuité de service** : Conserve les données même en cas d'indisponibilité temporaire de l'API CyberArk
-- **Analyses rétroactives** : Possibilité d'identifier les tendances et comportements anormaux
-- **Support du mode hors ligne** : L'application peut afficher les dernières données collectées même sans connexion
-- **Optimisation des performances** : Réduit les appels API répétitifs vers CyberArk
+1. Ouvrez Power BI Desktop
+2. Ouvrez le fichier `powerbi/CyberArk_Dashboard.pbix`
+3. Configurez la connexion à l'API : `http://localhost:8000/api/dashboard`
+4. Actualisez les données
 
-## Documentation
+## 🗄️ Base de données
 
+La base de données stocke l'historique de l'état de santé pour:
+
+1. **Analyse de tendances** - Visualisez l'évolution des métriques dans le temps
+2. **Continuité de service** - Accédez aux données même pendant les pannes d'API
+3. **Optimisation des performances** - Identifiez les goulots d'étranglement et améliorez les performances
+
+## 📚 Documentation
+
+- [Guide d'utilisation](docs/user-guide.md)
 - [Guide d'installation](docs/installation.md)
-- [Guide de l'utilisateur](docs/user-guide.md)
-- [Documentation de l'API](http://localhost:8000/docs) (disponible après démarrage)
-- [Schéma des données](docs/data-schema.md)
-- [Dépannage](docs/troubleshooting.md)
+- [Résolution des problèmes](docs/troubleshooting.md)
+- [Référence API](docs/api-reference.md)
+- [Schéma de données](docs/data-schema.md)
 
-## Développement
+## 🛠️ Développement
 
-Pour contribuer au projet :
+Pour contribuer au développement:
 
 ```bash
 # Créer un environnement virtuel
 python -m venv venv
-source venv/bin/activate  # ou venv\Scripts\activate sur Windows
+source venv/bin/activate  # Linux/Mac
+venv\Scripts\activate     # Windows
 
 # Installer les dépendances de développement
 pip install -r requirements-dev.txt
 
-# Lancer les tests
+# Exécuter les tests
 pytest
 ```
 
-## Licence
+## 📄 Licence
 
 Ce projet est sous licence MIT. Voir le fichier [LICENSE](LICENSE) pour plus de détails.
 
-## Contribution
+## 🤝 Contribution
 
-Toute contribution est la bienvenue ! Veuillez consulter [CONTRIBUTING.md](CONTRIBUTING.md) pour les directives.
+Les contributions sont les bienvenues! Consultez [CONTRIBUTING.md](CONTRIBUTING.md) pour les directives.
 
-## Contact
+## 📧 Contact
 
-Pour toute question ou suggestion, veuillez ouvrir une issue sur ce dépôt.
+Pour toute question ou assistance, créez une issue sur GitHub ou contactez l'équipe de développement.
