@@ -1,0 +1,341 @@
+{
+  "component_status": {
+    "Items": [
+      {
+        "Component Type": "CPM",
+        "Total Amount": 3,
+        "Connected": 3,
+        "Disconnected": 0,
+        "Status": "OK",
+        "Components": [
+          {
+            "Component Type": "CPM",
+            "Component Version": "12.6.0",
+            "IP Address": "10.0.0.10",
+            "Component User": "PasswordManager",
+            "Connected": true,
+            "Last Connection": "2023-04-20T15:30:22Z",
+            "OS": "Windows"
+          },
+          {
+            "Component Type": "CPM",
+            "Component Version": "12.6.0",
+            "IP Address": "10.0.0.11",
+            "Component User": "PasswordManager",
+            "Connected": true,
+            "Last Connection": "2023-04-20T15:31:45Z",
+            "OS": "Windows"
+          },
+          {
+            "Component Type": "CPM",
+            "Component Version": "12.6.0",
+            "IP Address": "10.0.0.12",
+            "Component User": "PasswordManager",
+            "Connected": true,
+            "Last Connection": "2023-04-20T15:28:15Z",
+            "OS": "Windows"
+          }
+        ]
+      },
+      {
+        "Component Type": "PVWA",
+        "Total Amount": 2,
+        "Connected": 2,
+        "Disconnected": 0,
+        "Status": "OK",
+        "Components": [
+          {
+            "Component Type": "PVWA",
+            "Component Version": "12.6.0",
+            "IP Address": "10.0.0.20",
+            "Component User": "PVWAApp",
+            "Connected": true,
+            "Last Connection": "2023-04-20T15:35:10Z",
+            "OS": "Windows"
+          },
+          {
+            "Component Type": "PVWA",
+            "Component Version": "12.6.0",
+            "IP Address": "10.0.0.21",
+            "Component User": "PVWAApp",
+            "Connected": true,
+            "Last Connection": "2023-04-20T15:34:22Z",
+            "OS": "Windows"
+          }
+        ]
+      },
+      {
+        "Component Type": "PSM",
+        "Total Amount": 4,
+        "Connected": 3,
+        "Disconnected": 1,
+        "Status": "Warning",
+        "Components": [
+          {
+            "Component Type": "PSM",
+            "Component Version": "12.6.0",
+            "IP Address": "10.0.0.30",
+            "Component User": "PSMApp",
+            "Connected": true,
+            "Last Connection": "2023-04-20T15:32:11Z",
+            "OS": "Windows"
+          },
+          {
+            "Component Type": "PSM",
+            "Component Version": "12.6.0",
+            "IP Address": "10.0.0.31",
+            "Component User": "PSMApp",
+            "Connected": true,
+            "Last Connection": "2023-04-20T15:33:45Z",
+            "OS": "Windows"
+          },
+          {
+            "Component Type": "PSM",
+            "Component Version": "12.6.0",
+            "IP Address": "10.0.0.32",
+            "Component User": "PSMApp",
+            "Connected": true,
+            "Last Connection": "2023-04-20T15:30:56Z",
+            "OS": "Windows"
+          },
+          {
+            "Component Type": "PSM",
+            "Component Version": "12.6.0",
+            "IP Address": "10.0.0.33",
+            "Component User": "PSMApp",
+            "Connected": false,
+            "Last Connection": "2023-04-20T10:15:22Z",
+            "OS": "Windows"
+          }
+        ]
+      },
+      {
+        "Component Type": "AAM Credential Provider",
+        "Total Amount": 2,
+        "Connected": 2,
+        "Disconnected": 0,
+        "Status": "OK",
+        "Components": [
+          {
+            "Component Type": "AAM Credential Provider",
+            "Component Version": "12.6.0",
+            "IP Address": "10.0.0.40",
+            "Component User": "AIMApp",
+            "Connected": true,
+            "Last Connection": "2023-04-20T15:36:32Z",
+            "OS": "Windows"
+          },
+          {
+            "Component Type": "AAM Credential Provider",
+            "Component Version": "12.6.0",
+            "IP Address": "10.0.0.41",
+            "Component User": "AIMApp",
+            "Connected": true,
+            "Last Connection": "2023-04-20T15:35:18Z",
+            "OS": "Windows"
+          }
+        ]
+      }
+    ]
+  },
+  "vault_status": {
+    "Safes": {
+      "Total_Safes": 45,
+      "Total_Accounts": 1250,
+      "Version": "12.6.0",
+      "License_Status": "Valid",
+      "License_Expiration": "2025-12-31T00:00:00Z"
+    }
+  },
+  "accounts_status": {
+    "value": {
+      "Total_Accounts": 1250,
+      "Managed_Accounts": 980,
+      "Non_Managed_Accounts": 270,
+      "Pending_Accounts": 5,
+      "Failed_Accounts": 3
+    }
+  },
+  "system_health": {
+    "CPU_Usage": 35.5,
+    "Memory_Usage": 42.3,
+    "Disk_Usage": 68.7,
+    "Network_Latency": 5.2,
+    "Last_Backup": "2023-04-20T08:30:00Z"
+  },
+  "recent_activities": [
+    {
+      "Timestamp": "2023-04-20T15:40:22Z",
+      "EventType": "LoginSuccess",
+      "Username": "admin",
+      "Source_IP": "192.168.1.100",
+      "Target_Safe": null,
+      "Target_Account": null,
+      "Severity": "Info",
+      "Description": "Successful login"
+    },
+    {
+      "Timestamp": "2023-04-20T15:35:18Z",
+      "EventType": "AccountAccessed",
+      "Username": "john.doe",
+      "Source_IP": "192.168.1.101",
+      "Target_Safe": "WindowsAdmins",
+      "Target_Account": "Domain Administrator",
+      "Severity": "Info",
+      "Description": "Account retrieved"
+    },
+    {
+      "Timestamp": "2023-04-20T15:30:05Z",
+      "EventType": "AccountChanged",
+      "Username": "cpm_user",
+      "Source_IP": "10.0.0.10",
+      "Target_Safe": "UnixAdmins",
+      "Target_Account": "root",
+      "Severity": "Info",
+      "Description": "Password changed successfully"
+    },
+    {
+      "Timestamp": "2023-04-20T15:25:40Z",
+      "EventType": "SafeCreated",
+      "Username": "admin",
+      "Source_IP": "192.168.1.100",
+      "Target_Safe": "NewApplicationSafe",
+      "Target_Account": null,
+      "Severity": "Info",
+      "Description": "New safe created"
+    },
+    {
+      "Timestamp": "2023-04-20T15:20:12Z",
+      "EventType": "LoginFailed",
+      "Username": "jane.smith",
+      "Source_IP": "192.168.1.120",
+      "Target_Safe": null,
+      "Target_Account": null,
+      "Severity": "Warning",
+      "Description": "Invalid credentials"
+    },
+    {
+      "Timestamp": "2023-04-20T15:15:33Z",
+      "EventType": "AccountAccessDenied",
+      "Username": "bob.johnson",
+      "Source_IP": "192.168.1.110",
+      "Target_Safe": "DatabaseAdmins",
+      "Target_Account": "sa",
+      "Severity": "Warning",
+      "Description": "Access denied - insufficient permissions"
+    },
+    {
+      "Timestamp": "2023-04-20T15:10:25Z",
+      "EventType": "PolicyViolation",
+      "Username": "admin",
+      "Source_IP": "192.168.1.100",
+      "Target_Safe": "WindowsAdmins",
+      "Target_Account": "Domain Administrator",
+      "Severity": "Critical",
+      "Description": "Password complexity policy violation"
+    },
+    {
+      "Timestamp": "2023-04-20T15:05:19Z",
+      "EventType": "VerificationFailed",
+      "Username": "cpm_user",
+      "Source_IP": "10.0.0.10",
+      "Target_Safe": "NetworkDevices",
+      "Target_Account": "cisco_admin",
+      "Severity": "Warning",
+      "Description": "Password verification failed"
+    },
+    {
+      "Timestamp": "2023-04-20T15:00:45Z",
+      "EventType": "ReconciliationFailed",
+      "Username": "cpm_user",
+      "Source_IP": "10.0.0.10",
+      "Target_Safe": "WindowsServers",
+      "Target_Account": "Administrator",
+      "Severity": "Warning",
+      "Description": "Reconciliation failed - could not connect to target"
+    },
+    {
+      "Timestamp": "2023-04-20T14:55:37Z",
+      "EventType": "SessionStarted",
+      "Username": "alice.white",
+      "Source_IP": "192.168.1.150",
+      "Target_Safe": "UnixServers",
+      "Target_Account": "root",
+      "Severity": "Info",
+      "Description": "PSM session started"
+    }
+  ],
+  "failed_logins": [
+    {
+      "Timestamp": "2023-04-20T15:20:12Z",
+      "Username": "jane.smith",
+      "Source_IP": "192.168.1.120",
+      "Severity": "Warning",
+      "Reason": "Invalid credentials"
+    },
+    {
+      "Timestamp": "2023-04-20T14:50:22Z",
+      "Username": "john.doe",
+      "Source_IP": "192.168.1.101",
+      "Severity": "Warning",
+      "Reason": "Account locked"
+    },
+    {
+      "Timestamp": "2023-04-20T14:45:35Z",
+      "Username": "admin",
+      "Source_IP": "192.168.200.50",
+      "Severity": "Critical",
+      "Reason": "IP not allowed"
+    },
+    {
+      "Timestamp": "2023-04-20T14:35:18Z",
+      "Username": "unknown",
+      "Source_IP": "172.16.10.100",
+      "Severity": "Critical",
+      "Reason": "User does not exist"
+    },
+    {
+      "Timestamp": "2023-04-20T14:25:42Z",
+      "Username": "bob.johnson",
+      "Source_IP": "192.168.1.110",
+      "Severity": "Warning",
+      "Reason": "Invalid credentials"
+    },
+    {
+      "Timestamp": "2023-04-20T14:20:33Z",
+      "Username": "jane.smith",
+      "Source_IP": "192.168.1.120",
+      "Severity": "Warning",
+      "Reason": "Invalid credentials"
+    },
+    {
+      "Timestamp": "2023-04-20T14:10:15Z",
+      "Username": "jane.smith",
+      "Source_IP": "192.168.1.120",
+      "Severity": "Warning",
+      "Reason": "Invalid credentials"
+    },
+    {
+      "Timestamp": "2023-04-20T13:55:29Z",
+      "Username": "unknown",
+      "Source_IP": "10.0.150.200",
+      "Severity": "Critical",
+      "Reason": "User does not exist"
+    },
+    {
+      "Timestamp": "2023-04-20T13:40:11Z",
+      "Username": "admin",
+      "Source_IP": "10.1.1.100",
+      "Severity": "Critical",
+      "Reason": "IP not allowed"
+    },
+    {
+      "Timestamp": "2023-04-20T13:25:47Z",
+      "Username": "alice.white",
+      "Source_IP": "192.168.1.150",
+      "Severity": "Warning",
+      "Reason": "Account locked"
+    }
+  ],
+  "last_update": "2023-04-20T15:45:00Z"
+}
