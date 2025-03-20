@@ -1,0 +1,10 @@
+Cette représentation texte est un placeholder pour un fichier PBIX binaire.
+Dans un environnement de production, il faudrait créer un véritable fichier PowerBI et le télécharger.
+Comme il s'agit d'une démonstration, ce fichier sert simplement d'exemple et devra être remplacé par un fichier PBIX réel.
+
+Pour créer un vrai fichier PBIX:
+1. Ouvrir Power BI Desktop
+2. Se connecter à l'API via Web: http://localhost:8000/api/dashboard
+3. Créer les visualisations selon les recommandations du README
+4. Enregistrer le fichier en tant que "CyberArk_Dashboard.pbix"
+5. Remplacer ce fichier par le véritable fichier PBIX
