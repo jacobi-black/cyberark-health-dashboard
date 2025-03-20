@@ -1,7 +1,11 @@
-from fastapi import FastAPI, BackgroundTasks, HTTPException, Query
+from fastapi import FastAPI, BackgroundTasks, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 import logging
 from datetime import datetime
+import os
+from pathlib import Path
 
 from app.models import DashboardData, SessionLocal
 from app.health_collector import collector
@@ -31,6 +35,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Configuration des templates
+BASE_DIR = Path(__file__).resolve().parent
+templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
+
+# Montage des fichiers statiques
+app.mount("/static", StaticFiles(directory=str(BASE_DIR / "static")), name="static")
+app.mount("/powerbi", StaticFiles(directory=str(BASE_DIR.parent / "powerbi")), name="powerbi")
+
 # Dépendance pour obtenir une connexion à la base de données
 def get_db():
     db = SessionLocal()
@@ -56,6 +68,13 @@ async def shutdown_event():
     logger.info("Arrêt de l'API")
     # Arrêter le collecteur de données
     collector.stop()
+
+@app.get("/", summary="Page d'accueil", tags=["Interface"])
+async def home(request: Request):
+    """
+    Page d'accueil du dashboard
+    """
+    return templates.TemplateResponse("index.html", {"request": request})
 
 @app.get("/api/health", summary="Vérifier l'état de santé de l'API", tags=["Santé"])
 async def health_check():
